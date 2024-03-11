@@ -1,3 +1,5 @@
+use std::fs::File;
+use std::io::Write;
 use anyhow::Result;
 use keccak_ctl::keccak::keccak256;
 use keccak_hash::keccak;
@@ -22,6 +24,12 @@ fn main() -> Result<()> {
     println!("{:#?}", data.verifier_only);
 
     println!("Proof size: {} bytes", proof.to_bytes().len());
+
+    let proof_json = serde_json::to_string(&proof);
+    let mut file = File::create(format!("keccak-proof-{}", MSG_LEN)).expect("failed to create file");
+    file.write_all(proof_json.as_bytes()).expect("failed to write proof json");
+
+    println!("file written");
 
     Ok(())
 }

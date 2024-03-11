@@ -24,6 +24,7 @@ tiny-keccak.workspace = true
 hashbrown.workspace = true
 ethereum-types.workspace = true
 num.workspace = true
+serde_json = "1.0.107"
 
 [lib]
 doctest = false
