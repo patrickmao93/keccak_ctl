@@ -8,7 +8,8 @@ fn main() -> Result<()> {
     type F = GoldilocksField;
     type C = PoseidonGoldilocksConfig;
 
-    const MSG_LEN: usize = 1;
+    const MSG_LEN: usize = 8704;
+    // const MSG_LEN: usize = 139264;
 
     let input: Vec<u8> = (0..MSG_LEN).map(|_| rand::random()).collect();
     let expected = keccak(&input);

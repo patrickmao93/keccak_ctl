@@ -21,18 +21,24 @@ pub fn keccak256<F, C, const D: usize>(
     msg: &[u8],
     hash: &[u8],
 ) -> Result<(CircuitData<F, C, D>, ProofWithPublicInputs<F, C, D>)>
-where
-    F: RichField + Extendable<D>,
-    C: GenericConfig<D, F = F>,
-    C::Hasher: AlgebraicHasher<F>,
-    [(); C::Hasher::HASH_SIZE]:,
-    [(); KeccakSpongeStark::<F, D>::COLUMNS]:,
-    [(); KeccakSpongeStark::<F, D>::PUBLIC_INPUTS]:,
-    [(); KeccakPermutationStark::<F, D>::COLUMNS]:,
-    [(); KeccakPermutationStark::<F, D>::PUBLIC_INPUTS]:,
-    [(); KeccakXORStark::<F, D>::COLUMNS]:,
+    where
+        F: RichField + Extendable<D>,
+        C: GenericConfig<D, F=F>,
+        C::Hasher: AlgebraicHasher<F>,
+        [(); C::Hasher::HASH_SIZE]:,
+        [(); KeccakSpongeStark::<F, D>::COLUMNS]:,
+        [(); KeccakSpongeStark::<F, D>::PUBLIC_INPUTS]:,
+        [(); KeccakPermutationStark::<F, D>::COLUMNS]:,
+        [(); KeccakPermutationStark::<F, D>::PUBLIC_INPUTS]:,
+        [(); KeccakXORStark::<F, D>::COLUMNS]:,
 {
     let (stark, proof) = keccak256proof_stark::<F, C, D>(msg, hash)?;
+
+    proof.stark_proofs.iter()
+        .map(|x| { x.to_bytes().len() })
+        .for_each(|x1| {
+            println!("inner stark proof size {}", x1);
+        });
 
     keccak256verify_stark(stark.clone(), proof.clone())?;
 
