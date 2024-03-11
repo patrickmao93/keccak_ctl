@@ -25,7 +25,7 @@ fn main() -> Result<()> {
 
     println!("Proof size: {} bytes", proof.to_bytes().len());
 
-    let proof_json = serde_json::to_string(&proof);
+    let proof_json = serde_json::to_string(&proof).unwrap();
     let mut file = File::create(format!("keccak-proof-{}", MSG_LEN)).expect("failed to create file");
     file.write_all(proof_json.as_bytes()).expect("failed to write proof json");
 
