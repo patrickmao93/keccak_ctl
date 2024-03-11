@@ -18,7 +18,8 @@ fn main() -> Result<()> {
 
     let (data, proof) = keccak256::<F, C, D>(&input, expected.as_bytes())?;
 
-    println!("num gate constraints {:?}", data.common);
+    println!("{:?}", data.common);
+    println!("{:?}", data.verifier_only);
 
     println!("Proof size: {} bytes", proof.to_bytes().len());
 
