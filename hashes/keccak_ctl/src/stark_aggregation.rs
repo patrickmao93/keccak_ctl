@@ -43,22 +43,26 @@ use crate::proof_ctl::KeccakCtlProof;
 
 pub fn aggregation_sponge_permutation<
     F: RichField + Extendable<D>,
-    C: GenericConfig<D, F = F>,
+    C: GenericConfig<D, F=F>,
     const D: usize,
 >(
     all_stark: &KeccakCtl<F, D>,
     all_proof: KeccakCtlProof<F, C, D>,
 ) -> Result<(CircuitData<F, C, D>, ProofWithPublicInputs<F, C, D>)>
-where
-    C::Hasher: AlgebraicHasher<F>,
-    [(); KeccakPermutationStark::<F, D>::COLUMNS]:,
-    [(); KeccakPermutationStark::<F, D>::PUBLIC_INPUTS]:,
-    [(); KeccakSpongeStark::<F, D>::COLUMNS]:,
-    [(); KeccakSpongeStark::<F, D>::PUBLIC_INPUTS]:,
-    [(); KeccakXORStark::<F, D>::COLUMNS]:,
+    where
+        C::Hasher: AlgebraicHasher<F>,
+        [(); KeccakPermutationStark::<F, D>::COLUMNS]:,
+        [(); KeccakPermutationStark::<F, D>::PUBLIC_INPUTS]:,
+        [(); KeccakSpongeStark::<F, D>::COLUMNS]:,
+        [(); KeccakSpongeStark::<F, D>::PUBLIC_INPUTS]:,
+        [(); KeccakXORStark::<F, D>::COLUMNS]:,
 {
     let config = StarkConfig::standard_fast_config();
-    let mut builder = CircuitBuilder::<F, D>::new(CircuitConfig::standard_recursion_config());
+    let mut reconfig = CircuitConfig::standard_recursion_config();
+    reconfig.fri_config.rate_bits = 1;
+    reconfig.fri_config.num_query_rounds = 90;
+    reconfig.fri_config.proof_of_work_bits = 10;
+    let mut builder = CircuitBuilder::<F, D>::new(reconfig);
     let zero_target = builder.zero();
     let mut pw = PartialWitness::new();
 
@@ -235,7 +239,7 @@ where
         num_permutation_batch_size,
         &config,
     );
- 
+
     verify_stark_proof_with_challenges_circuit::<F, C, KeccakXORStark<F, D>, D>(
         &mut builder,
         all_stark.keccak_xor_stark.clone(),
@@ -276,7 +280,7 @@ where
 /// Recursively verifies an inner proof.
 pub fn verify_stark_proof_with_challenges_circuit<
     F: RichField + Extendable<D>,
-    C: GenericConfig<D, F = F>,
+    C: GenericConfig<D, F=F>,
     S: Stark<F, D>,
     const D: usize,
 >(
